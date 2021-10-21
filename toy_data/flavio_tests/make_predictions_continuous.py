@@ -9,6 +9,7 @@ import flavio.plots
 import warnings
 warnings.filterwarnings("ignore")
 from tqdm import tqdm
+import pandas as pd
 
 #%%
 def print_observables(observables):
@@ -29,7 +30,7 @@ def compute_I(si, k, l, p):
         phi
     '''
 
-    fl =  3/4*(1 - si['FL']) * (np.sin(k) ** 2) + si['FL'] * (np.cos(k) ** 2) + 1/4 * (1 - si['FL']) * (np.sin(k) ** 2) * np.cos(2*l) - si['FL'] * (np.cos(k) ** 2) * np.cos(l)
+    fl =  3/4*(1 - si['FL']) * (np.sin(k) ** 2) + si['FL'] * (np.cos(k) ** 2) + 1/4 * (1 - si['FL']) * (np.sin(k) ** 2) * np.cos(2*l) - si['FL'] * (np.cos(k) ** 2) * np.cos(2*l)
     s3 = si['S3'] * (np.sin(k) ** 2) * (np.sin(l) ** 2) * np.cos(2 * p)
     s4 = si['S4'] * np.sin(2 * k) * np.sin(2*l) * np.cos(p)
     s5 = si['S5'] * np.sin(2 * k) * np.sin(l) * np.cos(p)
