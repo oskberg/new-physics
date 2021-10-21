@@ -55,7 +55,6 @@ class Multiple:
 
     def formatter(self):
         return plt.FuncFormatter(multiple_formatter(self.denominator, self.number, self.latex))
-
 # %%
 def compute_J_from_vec(vec, wilson_coef=None):
     if wilson_coef is not None:
@@ -107,8 +106,9 @@ l_min, l_max = 0, 2 * np.pi
 p_min, p_max = 0, 2 * np.pi
 
 data_points = []
-
-for i in tqdm(range(10000)):
+excluded = 0
+included = 0
+for i in tqdm(range(100)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
@@ -126,9 +126,12 @@ for i in tqdm(range(10000)):
     # 4. compare to random J
     if J_rnd < J_comp:
         data_points.append(data_vector)
+        included +=1 
+    else:
+        excluded +=1 
 
 # %%
-data_points = pd.DataFrame(data_points)
+data_points = pd.DataFrame(data_points).rename(columns={r'q2':'$q^2$', 'k':'$\\theta_k$', 'l':'$\\theta_l$', 'p':'$\phi$'})
 # %%
 f,ax=plt.subplots(2,2, figsize=(15,10))
 
@@ -136,11 +139,15 @@ f,ax=plt.subplots(2,2, figsize=(15,10))
 
 for i in range(2):
     for j in range(2):
-        data_points[data_points.columns[2 * i + j]].plot.hist(bins=50, density=True, ax=ax[i,j])
+        var = data_points.columns[2 * i + j]
+        data_points[var].plot.hist(bins=50, density=True, ax=ax[i,j])
         if (j + i) != 0:
             ax[i,j].xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
             ax[i,j].xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 12))
             ax[i,j].xaxis.set_major_formatter(plt.FuncFormatter(multiple_formatter()))
-
-
+        
+        ax[i,j].set_xlabel(var)
+plt.show()
+# %%
+plt.hist(data_points.index)
 # %%
