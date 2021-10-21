@@ -1,6 +1,8 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
+plt.rcParams.update({'text.usetex':False})
+
 import flavio
 import flavio.plots
 import pandas as pd
@@ -108,7 +110,7 @@ p_min, p_max = 0, 2 * np.pi
 
 data_points = []
 
-for i in tqdm(range(10000)):
+for i in tqdm(range(100000)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
@@ -125,6 +127,7 @@ for i in tqdm(range(10000)):
 
     # 4. compare to random J
     if J_rnd < J_comp:
+        data_vector['J_comp'] = J_comp
         data_points.append(data_vector)
 
 # %%
@@ -137,10 +140,10 @@ f,ax=plt.subplots(2,2, figsize=(15,10))
 for i in range(2):
     for j in range(2):
         data_points[data_points.columns[2 * i + j]].plot.hist(bins=50, density=True, ax=ax[i,j])
-        if (j + i) != 0:
-            ax[i,j].xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
-            ax[i,j].xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 12))
-            ax[i,j].xaxis.set_major_formatter(plt.FuncFormatter(multiple_formatter()))
-
-
+        # if (j + i) != 0:
+        #     ax[i,j].xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
+        #     ax[i,j].xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 12))
+        #     ax[i,j].xaxis.set_major_formatter(plt.FuncFormatter(multiple_formatter()))
+# %%
+jj = data_points.apply(lambda x: x, axis=0)
 # %%
