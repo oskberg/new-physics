@@ -1,6 +1,8 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
+plt.rcParams.update({'text.usetex':False})
+
 import flavio
 import flavio.plots
 import pandas as pd
@@ -108,7 +110,7 @@ p_min, p_max = 0, 2 * np.pi
 data_points = []
 excluded = 0
 included = 0
-for i in tqdm(range(100)):
+for i in tqdm(range(100000)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
@@ -125,6 +127,7 @@ for i in tqdm(range(100)):
 
     # 4. compare to random J
     if J_rnd < J_comp:
+        data_vector['J_comp'] = J_comp
         data_points.append(data_vector)
         included +=1 
     else:
@@ -149,5 +152,7 @@ for i in range(2):
         ax[i,j].set_xlabel(var)
 plt.show()
 # %%
-plt.hist(data_points.index)
+f, ax = plt.subplots()
+data_points['J_comp'].hist(bins=30, density=True, grid=False, ax=ax)
+ax.set_xlabel('$J$')
 # %%
