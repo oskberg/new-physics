@@ -50,7 +50,7 @@ def format_range(x, a, b):
 # DEFINE CONSTANTS
 
 c9, c10 = 0, 0
-J_min, J_max = 0,1.7
+J_min, J_max = 0,1.8
 q2_min, q2_max = 1, 19
 k_min, k_max = 0, np.pi
 l_min, l_max = 0, np.pi
@@ -62,12 +62,15 @@ included = 0
 
 wc_np = flavio.WilsonCoefficients()
 
+c9_busmsm = int(input('C9_bsmumu = '))
+c10_busmsm = int(input('C10_bsmumu = '))
+
 #This is the SM
-wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : 0.}, scale = 100)
+wc_np.set_initial({'C9_bsmumu' : c9_busmsm, 'C10_bsmumu' : c10_busmsm}, scale = 100)
 
 
 
-for i in tqdm(range(100)):
+for i in tqdm(range(int(input('datapoints = ')))):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
