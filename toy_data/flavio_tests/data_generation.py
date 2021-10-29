@@ -104,6 +104,6 @@ data_points = pd.DataFrame(data_points)
 
 date = datetime.datetime.now()
 
-data_points.to_csv(f'data/toy_data_c9_{c9}_c10_{c10}_{date.year}_{date.month}_{date.day}_{date.hour}.csv')
+data_points.to_csv(f'data/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv')
 
 # pd.DataFrame({'a':[1,1],'b':[2,1]}).to_csv('data/blah.csv')
