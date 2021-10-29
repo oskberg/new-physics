@@ -62,8 +62,8 @@ included = 0
 
 wc_np = flavio.WilsonCoefficients()
 
-c9_busmsm = int(input('C9_bsmumu = '))
-c10_busmsm = int(input('C10_bsmumu = '))
+c9_busmsm = float(input('C9_bsmumu = '))
+c10_busmsm = float(input('C10_bsmumu = '))
 
 #This is the SM
 wc_np.set_initial({'C9_bsmumu' : c9_busmsm, 'C10_bsmumu' : c10_busmsm}, scale = 100)
