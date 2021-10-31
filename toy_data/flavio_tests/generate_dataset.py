@@ -110,7 +110,7 @@ p_min, p_max = 0, 2 * np.pi
 
 data_points = []
 
-for i in tqdm(range(100000)):
+for i in tqdm(range(3000000)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 

@@ -9,6 +9,8 @@ from pynverse import inversefunc
 
 import flavio
 # %%
+plt.rcParams.update({'text.usetex':False})
+# %%
 ''' Inverse transform method '''
 a, b = -1, 3
 
