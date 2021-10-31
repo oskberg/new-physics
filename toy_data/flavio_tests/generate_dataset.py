@@ -1,6 +1,7 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.core.fromnumeric import nonzero
 plt.rcParams.update({'text.usetex':False})
 
 import flavio
@@ -57,7 +58,6 @@ class Multiple:
 
     def formatter(self):
         return plt.FuncFormatter(multiple_formatter(self.denominator, self.number, self.latex))
-
 # %%
 def compute_J_from_vec(vec, wilson_coef=None):
     if wilson_coef is not None:
@@ -102,13 +102,22 @@ def format_range(x, a, b):
     ''' given uniform x in range [0,1], ouptut uniform in range [a,b] '''
     return x * (b - a) + a
 # %%
-J_min, J_max = 0,1.7
-q2_min, q2_max = 1, 20
-k_min, k_max = 0, 2 * np.pi
-l_min, l_max = 0, 2 * np.pi
-p_min, p_max = 0, 2 * np.pi
+J_min, J_max = 0,1.8
+q2_min, q2_max = 1, 19
+k_min, k_max = 0, np.pi
+l_min, l_max = 0, np.pi
+p_min, p_max = -np.pi, np.pi
 
 data_points = []
+excluded = 0
+included = 0
+
+wc_np = flavio.WilsonCoefficients()
+
+#This is the SM
+# wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : 0.}, scale = 100)
+# scenario 8
+wc_np.set_initial({'C9_bsmumu' : -0.3, 'C10_bsmumu' : 0.3}, scale = 100)
 
 for i in tqdm(range(3000000)):
     # 1. generate random J
@@ -122,16 +131,30 @@ for i in tqdm(range(3000000)):
         'p':np.random.uniform(p_min, p_max),
         } # verified to be uniform
 
-    # 3. compute J from `data_vector`
-    J_comp = compute_J_from_vec(data_vector)
 
-    # 4. compare to random J
-    if J_rnd < J_comp:
-        data_vector['J_comp'] = J_comp
-        data_points.append(data_vector)
+    dBR = flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, data_vector['q2'])
+    
+    dBR_rnd = np.random.uniform(0, 1e-7)
+
+    if dBR_rnd < dBR:
+        # 3. compute J from `data_vector`
+        J_comp = compute_J_from_vec(data_vector)
+
+        # 4. compare to random J
+        if J_rnd < J_comp:
+            data_vector['J_comp'] = J_comp
+            data_points.append(data_vector)
+            included +=1 
+        else:
+            excluded +=1 
+    else:
+        excluded +=1 
 
 # %%
 data_points = pd.DataFrame(data_points)
+data_points['k'] = np.cos(data_points['k'])
+data_points['l'] = np.cos(data_points['l'])
+data_points = data_points.rename(columns={r'q2':'$q^2$', 'k':'$cos\\theta_k$', 'l':'$cos\\theta_l$', 'p':'$\phi$'})
 # %%
 f,ax=plt.subplots(2,2, figsize=(15,10))
 
@@ -139,11 +162,38 @@ f,ax=plt.subplots(2,2, figsize=(15,10))
 
 for i in range(2):
     for j in range(2):
-        data_points[data_points.columns[2 * i + j]].plot.hist(bins=50, density=True, ax=ax[i,j])
+        var = data_points.columns[2 * i + j]
+        data_points[var].plot.hist(bins=50, density=True, ax=ax[i,j])
         # if (j + i) != 0:
         #     ax[i,j].xaxis.set_major_locator(plt.MultipleLocator(np.pi / 2))
         #     ax[i,j].xaxis.set_minor_locator(plt.MultipleLocator(np.pi / 12))
         #     ax[i,j].xaxis.set_major_formatter(plt.FuncFormatter(multiple_formatter()))
+        
+        ax[i,j].set_xlabel(var)
+non_zero_c = [w for w in wc_np.get_wc('bsmumu', 100, {}).items() if w[1] != 0]
+
+title = ''
+for c_n, v in non_zero_c:
+    title += f'{c_n} = {v}, '
+title = title.replace('_', '\_')
+f.suptitle(title)
+plt.show()
 # %%
-jj = data_points.apply(lambda x: x, axis=0)
+f, ax = plt.subplots()
+data_points['J_comp'].hist(bins=30, density=True, grid=False, ax=ax)
+ax.set_xlabel('$J$')
+# %%
+qs = np.linspace(1,19,100)
+wc_np = flavio.WilsonCoefficients()
+
+#This is the SM
+wc_np.set_initial({'C9_bsmumu' : -0.0, 'C10_bsmumu' : 0.0}, scale = 100)
+dBR = [flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, qq) for qq in qs]
+
+plt.plot(qs, dBR)
+wc_np.set_initial({'C9_bsmumu' : -0.3, 'C10_bsmumu' : 0.3}, scale = 100)
+dBR = [flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, qq) for qq in qs]
+
+plt.plot(qs, dBR)
+plt.show()
 # %%

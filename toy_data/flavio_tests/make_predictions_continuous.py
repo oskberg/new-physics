@@ -87,6 +87,9 @@ for q2 in tqdm(np.linspace(q2_min, q2_max, q_steps)):
 df = pd.DataFrame(fac_values)
 
 # %%
+df = pd.DataFrame(df).rename(columns={r'q2':'$q^2$', 'k':'$\\theta_k$', 'l':'$\\theta_l$', 'p':'$\phi$'})
+
+# %%
 fig, axes = plt.subplots(2,2, figsize=(15,10))
 
 counter = 0
@@ -97,12 +100,13 @@ for a in axes:
         uniques = df[v].unique()
         l = [df[df[v] == var]['I'].values for var in uniques]
         
-        ax.violinplot(dataset = l,showmeans=False, showmedians=False,showextrema=False)
+        ax.violinplot(dataset = l,showmeans=False, showmedians=True,showextrema=False)
         ax.set_xlabel(v)
         ax.set_ylabel('I')
 
         counter += 1
 # %%
+
 # df.plot.scatter(x='q2', y='I', alpha=0.005, s=10)
 # %%
 df['I'].plot.hist(bins=200)
