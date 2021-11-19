@@ -132,4 +132,4 @@ dmypy.json
 .png
 .jpg
 .csv
-.DS_Store
+# .DS_Store
