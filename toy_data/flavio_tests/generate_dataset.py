@@ -119,7 +119,7 @@ wc_np = flavio.WilsonCoefficients()
 # scenario 8
 wc_np.set_initial({'C9_bsmumu' : -0.3, 'C10_bsmumu' : 0.3}, scale = 100)
 
-for i in tqdm(range(100_000)):
+for i in tqdm(range(3000000)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
