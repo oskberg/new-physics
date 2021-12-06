@@ -51,7 +51,7 @@ def format_range(x, a, b):
 
 c9, c10 = 0, 0
 J_min, J_max = 0,1.8
-q2_min, q2_max = 1, 19
+# q2_min, q2_max = 1, 19
 k_min, k_max = 0, np.pi
 l_min, l_max = 0, np.pi
 p_min, p_max = -np.pi, np.pi
@@ -64,7 +64,8 @@ wc_np = flavio.WilsonCoefficients()
 
 c9_busmsm = float(input('C9_bsmumu = '))
 c10_busmsm = float(input('C10_bsmumu = '))
-
+q2_min = float(input('q2_min = '))
+q2_max = float(input('q2_max = '))
 #This is the SM
 wc_np.set_initial({'C9_bsmumu' : c9_busmsm, 'C10_bsmumu' : c10_busmsm}, scale = 100)
 
@@ -74,7 +75,7 @@ for i in tqdm(range(int(input('datapoints = ')))):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
-    # 2. gnerate random kinematic vector
+    # 2. generate random kinematic vector
     data_vector = {
         'q2':np.random.uniform(q2_min, q2_max), 
         'k':np.random.uniform(k_min, k_max),
