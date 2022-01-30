@@ -129,7 +129,21 @@ dmypy.json
 .pyre/
 
 # data stuff
-.png
-.jpg
-.csv
-.DS_Store
+*.png
+*.jpg
+*.csv
+*.DS_Store
+*.pkl
+*.pb
+*.txt
+*.json
+*.pdf
+*.data
+*.nb
+
+toy_data/data_generation/data/*
+toy_data/wilson_regression/models/*
+error_evaluation/data/*
+
+
+.idea
