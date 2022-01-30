@@ -1,5 +1,5 @@
 ''' This script generates data using interpolation of the flavio.np_prediction for the observables. This should speed up the function significantly'''
-
+#%%
 import datetime
 from random import random
 from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
@@ -84,6 +84,32 @@ def compute_br_interpolated(df_og, obs_dict):
 
     return df['BR']
 
+
+def compute_dbr_interpolated(df_og, obs_dict):
+    df = df_og.copy()
+
+    q_in = obs_dict['q_range']
+    c9_in = obs_dict['c9_range']
+    c10_in = obs_dict['c10_range']
+
+    Q_in = obs_dict['q_grid']
+    C9_in = obs_dict['c9_grid']
+    C10_in = obs_dict['c10_grid']
+
+    true_br_vals = obs_dict['dBR/dq2']
+
+    eval_points_q, eval_points_c9, eval_points_c10 = df['q2'], df['c9'], df['c10']
+
+    interpolated_br_values = interp.interpn(
+        [q_in, c9_in, c10_in],
+        true_br_vals,
+        (eval_points_q, eval_points_c9, eval_points_c10),
+        method='linear'
+    )
+
+    return interpolated_br_values
+
+#%%
 # DEFINE CONSTANTS
 obs_si = ['FL', 'AFB', 'S3', 'S4', 'S5', 'S7', 'S8', 'S9']
 
@@ -107,7 +133,7 @@ wc_np.set_initial(
     {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_27_13'
+observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_30_23'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
@@ -128,47 +154,25 @@ random_data = pd.DataFrame({
     'c10': [c10_busmsm] * number_data_points,
 })
 
+#%%
+
 random_data['BR_rnd'] = np.random.uniform(min_br, max_br, number_data_points)
 random_data['dBR_rnd'] = np.random.uniform(min_dbr, max_dbr, number_data_points)
 
-random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
+#%%
+# random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
+random_data['dBR'] = compute_dbr_interpolated(
+    random_data[['q2', 'c9', 'c10']], observable_dict_import
+)
 
+#%%
 q2_filtered_data = random_data[random_data['dBR_rnd'] < random_data['dBR']].copy()
+#%%
 
 q2_filtered_data['BR_interpolated'] = compute_br_interpolated(
     q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
 
 completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
-# # perform
-# for i in tqdm(range(int(input('datapoints = ')))):
-#     # 1. generate random J
-#     J_rnd = np.random.random() * 1.7
-
-#     # 2. generate random kinematic vector
-#     data_vector = {
-#         'q2': np.random.uniform(q2_min, q2_max),
-#         'k': np.random.uniform(k_min, k_max),
-#         'l': np.random.uniform(l_min, l_max),
-#         'p': np.random.uniform(p_min, p_max),
-#     }  # verified to be uniform
-
-#     dBR = flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, data_vector['q2'])
-
-#     dBR_rnd = np.random.uniform(0, 1e-7)
-
-#     if dBR_rnd < dBR:
-#         # 3. compute J from `data_vector`
-#         J_comp = compute_br_interpolated(data_vector)
-
-#         # 4. compare to random J
-#         if J_rnd < J_comp:
-#             data_vector['J_comp'] = J_comp
-#             data_points.append(data_vector)
-#             included += 1
-#         else:
-#             excluded += 1
-#     else:
-#         excluded += 1
 
 date = datetime.datetime.now()
 
