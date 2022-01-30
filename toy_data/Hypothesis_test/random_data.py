@@ -51,7 +51,7 @@ def format_range(x, a, b):
 
 c9, c10 = 0, 0
 J_min, J_max = 0,1.8
-q2_min, q2_max = 0.5, 6
+q2_min, q2_max = 1, 19
 k_min, k_max = 0, np.pi
 l_min, l_max = 0, np.pi
 p_min, p_max = -np.pi, np.pi
@@ -86,24 +86,15 @@ for i in tqdm(range(int(input('datapoints = ')))):
     
     dBR_rnd = np.random.uniform(0, 1e-7)
 
-    if dBR_rnd < dBR:
-        # 3. compute J from `data_vector`
-        J_comp = compute_J_from_vec(data_vector)
 
-        # 4. compare to random J
-        if J_rnd < J_comp:
-            data_vector['J_comp'] = J_comp
-            data_points.append(data_vector)
-            included +=1 
-        else:
-            excluded +=1 
-    else:
-        excluded +=1 
+    J_comp = compute_J_from_vec(data_vector)
+
+    data_vector['J_comp'] = J_comp
+    data_points.append(data_vector)
+
 
 data_points = pd.DataFrame(data_points)
 
 date = datetime.datetime.now()
 
-data_points.to_csv(f'/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/flavio_tests/data/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv')
-
-# pd.DataFrame({'a':[1,1],'b':[2,1]}).to_csv('data/blah.csv')
+data_points.to_csv(f'new-physics/new-physics/toy_data/Hypothesis_test/data/random_data.csv')

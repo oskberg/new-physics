@@ -115,11 +115,11 @@ included = 0
 wc_np = flavio.WilsonCoefficients()
 
 #This is the SM
-# wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : 0.}, scale = 100)
+wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : 0.}, scale = 100)
 # scenario 8
-wc_np.set_initial({'C9_bsmumu' : -0.3, 'C10_bsmumu' : 0.3}, scale = 100)
+# wc_np.set_initial({'C9_bsmumu' : -0.3, 'C10_bsmumu' : 0.3}, scale = 100)
 
-for i in tqdm(range(3000000)):
+for i in tqdm(range(10000)):
     # 1. generate random J
     J_rnd = np.random.random() * 1.7
 
@@ -197,3 +197,10 @@ dBR = [flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, qq) for qq in qs]
 plt.plot(qs, dBR)
 plt.show()
 # %%
+data_points
+
+# we make one data set out of two with two different
+#  Willson coefficients for example 0,0 and -0,3 and 0.3
+# 
+#%%
+data_points.to_csv('00.csv')

@@ -129,7 +129,9 @@ dmypy.json
 .pyre/
 
 # data stuff
-.png
-.jpg
-.csv
-.DS_Store
+*.json
+*.txt
+*.png
+*.jpg
+*.csv
+*.DS_Store
