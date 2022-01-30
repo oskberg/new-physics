@@ -56,19 +56,19 @@ def compute_I(si, k, l, p):
 # print_observables(stdPreds_si)
 # %%
 ''' Perform grid search over the different angles '''
-q2_min, q2_max = 1, 20
-k_min, k_max = 0, 2 * np.pi
-l_min, l_max = 0, 2 * np.pi
-p_min, p_max = 0, 2 * np.pi
+q2_min, q2_max = 1, 19
+k_min, k_max = 0, np.pi
+l_min, l_max = 0, np.pi
+p_min, p_max = -np.pi, np.pi
 
-angle_steps = 20
+angle_steps = 10
 q_steps = 20
 
 obs_si = ['FL', 'AFB', 'S3', 'S4', 'S5', 'S7', 'S8', 'S9']
 wc_np = flavio.WilsonCoefficients()
 
 #This is the SM
-wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : 0.}, scale = 160)
+wc_np.set_initial({'C9_bsmumu' : 0., 'C10_bsmumu' : -1.}, scale = 160)
 
 # for each q2, generate the S_i variables
 
