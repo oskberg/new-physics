@@ -107,7 +107,7 @@ wc_np.set_initial(
     {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_27_13'
+observable_data_path = '/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/interpolation/interp_2022_1_27_13'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
@@ -139,38 +139,11 @@ q2_filtered_data['BR_interpolated'] = compute_br_interpolated(
     q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
 
 completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
-# # perform
-# for i in tqdm(range(int(input('datapoints = ')))):
-#     # 1. generate random J
-#     J_rnd = np.random.random() * 1.7
 
-#     # 2. generate random kinematic vector
-#     data_vector = {
-#         'q2': np.random.uniform(q2_min, q2_max),
-#         'k': np.random.uniform(k_min, k_max),
-#         'l': np.random.uniform(l_min, l_max),
-#         'p': np.random.uniform(p_min, p_max),
-#     }  # verified to be uniform
 
-#     dBR = flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, data_vector['q2'])
 
-#     dBR_rnd = np.random.uniform(0, 1e-7)
-
-#     if dBR_rnd < dBR:
-#         # 3. compute J from `data_vector`
-#         J_comp = compute_br_interpolated(data_vector)
-
-#         # 4. compare to random J
-#         if J_rnd < J_comp:
-#             data_vector['J_comp'] = J_comp
-#             data_points.append(data_vector)
-#             included += 1
-#         else:
-#             excluded += 1
-#     else:
-#         excluded += 1
 
 date = datetime.datetime.now()
 
 completely_filtered_data.to_csv(
-    f'/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
+    f'/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/datasets/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
