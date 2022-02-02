@@ -1,5 +1,5 @@
 ''' This script generates data using interpolation of the flavio.np_prediction for the observables. This should speed up the function significantly'''
-#%%
+
 import datetime
 from random import random
 from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
@@ -84,32 +84,6 @@ def compute_br_interpolated(df_og, obs_dict):
 
     return df['BR']
 
-
-def compute_dbr_interpolated(df_og, obs_dict):
-    df = df_og.copy()
-
-    q_in = obs_dict['q_range']
-    c9_in = obs_dict['c9_range']
-    c10_in = obs_dict['c10_range']
-
-    Q_in = obs_dict['q_grid']
-    C9_in = obs_dict['c9_grid']
-    C10_in = obs_dict['c10_grid']
-
-    true_br_vals = obs_dict['dBR/dq2']
-
-    eval_points_q, eval_points_c9, eval_points_c10 = df['q2'], df['c9'], df['c10']
-
-    interpolated_br_values = interp.interpn(
-        [q_in, c9_in, c10_in],
-        true_br_vals,
-        (eval_points_q, eval_points_c9, eval_points_c10),
-        method='linear'
-    )
-
-    return interpolated_br_values
-
-#%%
 # DEFINE CONSTANTS
 obs_si = ['FL', 'AFB', 'S3', 'S4', 'S5', 'S7', 'S8', 'S9']
 
@@ -125,15 +99,12 @@ included = 0
 
 wc_np = flavio.WilsonCoefficients()
 
-c9_busmsm = float(input('C9_bsmumu = '))
-c10_busmsm = float(input('C10_bsmumu = '))
+
 q2_min = float(input('q2_min = '))
 q2_max = float(input('q2_max = '))
-wc_np.set_initial(
-    {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_31_0'
+observable_data_path = '/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/interpolation/interp_2022_1_27_13'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
@@ -145,46 +116,44 @@ number_data_points = int(input('datapoints = '))
 
 # GENERATE THE DATA
 
-random_data = pd.DataFrame({
-    'q2': np.random.uniform(q2_min, q2_max, number_data_points),
-    'k': np.random.uniform(k_min, k_max, number_data_points),
-    'l': np.random.uniform(l_min, l_max, number_data_points),
-    'p': np.random.uniform(p_min, p_max, number_data_points),
-    'c9': [c9_busmsm] * number_data_points,
-    'c10': [c10_busmsm] * number_data_points,
-})
 
-#%%
+# for c9_t in np.linspace(-1,1,10):
+#     for c10_t in np.linspace(-1,1,10):
 
-random_data['BR_rnd'] = np.random.uniform(min_br, max_br, number_data_points)
-random_data['dBR_rnd'] = np.random.uniform(min_dbr, max_dbr, number_data_points)
+c9_t = float(input('c9 = '))
+for i in range(2):
+    c10_t = float(input('c10 = '))
 
-#%%
-# random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
-random_data['dBR'] = compute_dbr_interpolated(
-    random_data[['q2', 'c9', 'c10']], observable_dict_import
-)
+    print(c9_t,c10_t)
 
-#%%
-q2_filtered_data = random_data[random_data['dBR_rnd'] < random_data['dBR']].copy()
-#%%
+    wc_np.set_initial({'C9_bsmumu': c9_t, 'C10_bsmumu': c10_t}, scale=100)
 
-q2_filtered_data['BR_interpolated'] = compute_br_interpolated(
-    q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
+    print('check1')   
+    random_data = pd.DataFrame({
+        'q2': np.random.uniform(q2_min, q2_max, number_data_points),
+        'k': np.random.uniform(k_min, k_max, number_data_points),
+        'l': np.random.uniform(l_min, l_max, number_data_points),
+        'p': np.random.uniform(p_min, p_max, number_data_points),
+        'c9': c9_t * number_data_points,
+        'c10': c10_t * number_data_points,
+    })
 
-completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
+    print('check2')   
 
 
+    random_data['BR_rnd'] = np.random.uniform(min_br, max_br, number_data_points)
+    random_data['dBR_rnd'] = np.random.uniform(min_dbr, max_dbr, number_data_points)
+    random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
+    print('check3') 
+    q2_filtered_data = random_data[random_data['dBR_rnd'] < random_data['dBR']].copy()
+    print('check3.5') 
+    q2_filtered_data['BR_interpolated'] = compute_br_interpolated(q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
+    print('check4') 
+    completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
 
 
-date = datetime.datetime.now()
+    date = datetime.datetime.now()
 
-completely_filtered_data.to_csv(
-    f'/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
+    completely_filtered_data.to_csv(
+        f'/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/datasets/toy_data_c9_{c9_t}_c10_{c10_t}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
 
-# %%
-import matplotlib.pyplot as plt
-dbr = np.array([flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2) for q2 in np.linspace(0.5,6,100)])
-plt.plot(np.linspace(0.5,6,100),np.array(dbr)*3.4e6)
-plt.hist(q2_filtered_data['q2'], density=True, bins=60)
-# %%
