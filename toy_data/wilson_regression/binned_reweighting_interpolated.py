@@ -13,13 +13,17 @@ import scipy.interpolate as interp
 import weight_calulations as wc
 
 # %%
-weightd_sm = pd.read_csv('data/low_q_with_weights.csv')
-clean_sm = weightd_sm[['q2', 'k', 'l', 'p', 'BR_sm']].copy()
+# weightd_sm = pd.read_csv('data/low_q_with_weights.csv')
+weightd_sm = pd.read_csv('/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_0.0_c10_0.0_2022_1_31_0.csv')
+# clean_sm = weightd_sm[['q2', 'k', 'l', 'p', 'BR_sm']].copy()
+clean_sm = weightd_sm[['q2', 'k', 'l', 'p', 'BR_interpolated']].copy()
+clean_sm.rename(columns={'BR_interpolated':'BR_sm'}, inplace=True)
 rounded_sm = clean_sm.copy()
 rounded_sm['q2'] = rounded_sm['q2'].round(2)
 
 
-observable_data_path = '../data_generation/data/interpolation/interp_2022_1_27_13'
+observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_31_0'
+# observable_data_path = '../data_generation/data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
 
@@ -33,8 +37,6 @@ Q_in = observable_dict_import['q_grid']
 C9_in = observable_dict_import['c9_grid']
 C10_in = observable_dict_import['c10_grid']
 # %%
-
-
 @lru_cache(maxsize=1000)
 def get_observable(key, q2, c9, c10):
     wilson_coef.set_initial({'C9_bsmumu': c9, 'C10_bsmumu': c10}, scale=100)
@@ -47,9 +49,9 @@ def get_observable(key, q2, c9, c10):
 
 
 # %%
-c_min, c_max = -1, 1
-n_samples = 10000
-sample_size = 5000
+c_min, c_max = -3, 3
+n_samples = 100000
+sample_size = 10000
 n_bins = 10
 bin_edges_ql = [
     np.linspace(0.5, 2, n_bins+1),           # q2
@@ -176,7 +178,7 @@ plt.show()
 # %%
 dataset
 # %%
-output_file_name = 'low_q_binned_weights_big_interp.pkl'
+output_file_name = f'binned_interp_{n_samples}n_{sample_size}points_{n_bins}bins_.pkl'
 path_to_file = 'data/'
 with open(path_to_file + output_file_name, 'wb') as out_file:
     pickle.dump(dataset, out_file)

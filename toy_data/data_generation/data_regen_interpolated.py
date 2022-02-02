@@ -133,7 +133,7 @@ wc_np.set_initial(
     {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_30_23'
+observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_31_0'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
@@ -178,3 +178,10 @@ date = datetime.datetime.now()
 
 completely_filtered_data.to_csv(
     f'/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
+
+# %%
+import matplotlib.pyplot as plt
+dbr = np.array([flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2) for q2 in np.linspace(0.5,6,100)])
+plt.plot(np.linspace(0.5,6,100),np.array(dbr)*3.4e6)
+plt.hist(q2_filtered_data['q2'], density=True, bins=60)
+# %%
