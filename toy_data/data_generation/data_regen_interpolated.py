@@ -133,6 +133,8 @@ q2_max = float(input('q2_max = '))
 # read in interpolation values
 # observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_1.1-8_-3-3_2022_2_15_19'
 observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_0.1-1_-3-3_2022_2_16_16'
+
+observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_31_0'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
