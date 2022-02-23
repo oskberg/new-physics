@@ -1,17 +1,15 @@
 ''' This script generates data using interpolation of the flavio.np_prediction for the observables. This should speed up the function significantly'''
 #%%
 import datetime
+import pickle
 from random import random
 from xml.dom.minidom import ReadOnlySequentialNamedNodeMap
 
 import flavio
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-
-import pickle
 import scipy.interpolate as interp
-
+from tqdm import tqdm
 
 # def compute_J_from_vec(vec, wilson_coef=None):
 #     if wilson_coef is not None:
@@ -129,11 +127,12 @@ c9_busmsm = float(input('C9_bsmumu = '))
 c10_busmsm = float(input('C10_bsmumu = '))
 q2_min = float(input('q2_min = '))
 q2_max = float(input('q2_max = '))
-wc_np.set_initial(
-    {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
+# wc_np.set_initial(
+#     {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_2022_1_31_0'
+# observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_1.1-8_-3-3_2022_2_15_19'
+observable_data_path = '/Users/oskar/MSci/new-physics/toy_data/data_generation/data/interpolation/interp_0.1-1_-3-3_2022_2_16_16'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
@@ -144,46 +143,46 @@ min_dbr, max_dbr = 0, 1e-7
 number_data_points = int(input('datapoints = '))
 
 # GENERATE THE DATA
-
-random_data = pd.DataFrame({
-    'q2': np.random.uniform(q2_min, q2_max, number_data_points),
-    'k': np.random.uniform(k_min, k_max, number_data_points),
-    'l': np.random.uniform(l_min, l_max, number_data_points),
-    'p': np.random.uniform(p_min, p_max, number_data_points),
-    'c9': [c9_busmsm] * number_data_points,
-    'c10': [c10_busmsm] * number_data_points,
-})
-
 #%%
+for c9_temp in np.arange(-3,4):
+    for c10_temp in np.arange(-3,4):
+        print(c9_temp, c10_temp)
 
-random_data['BR_rnd'] = np.random.uniform(min_br, max_br, number_data_points)
-random_data['dBR_rnd'] = np.random.uniform(min_dbr, max_dbr, number_data_points)
+        random_data = pd.DataFrame({
+            'q2': np.random.uniform(q2_min, q2_max, number_data_points),
+            'k': np.random.uniform(k_min, k_max, number_data_points),
+            'l': np.random.uniform(l_min, l_max, number_data_points),
+            'p': np.random.uniform(p_min, p_max, number_data_points),
+            'c9': [c9_temp] * number_data_points,
+            'c10': [c10_temp] * number_data_points,
+        })
 
-#%%
-# random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
-random_data['dBR'] = compute_dbr_interpolated(
-    random_data[['q2', 'c9', 'c10']], observable_dict_import
-)
+        random_data['BR_rnd'] = np.random.uniform(min_br, max_br, number_data_points)
+        random_data['dBR_rnd'] = np.random.uniform(min_dbr, max_dbr, number_data_points)
 
-#%%
-q2_filtered_data = random_data[random_data['dBR_rnd'] < random_data['dBR']].copy()
-#%%
+        # random_data['dBR'] = random_data['q2'].apply(lambda q2: flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2))
+        random_data['dBR'] = compute_dbr_interpolated(
+            random_data[['q2', 'c9', 'c10']], observable_dict_import
+        )
 
-q2_filtered_data['BR_interpolated'] = compute_br_interpolated(
-    q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
+        q2_filtered_data = random_data[random_data['dBR_rnd'] < random_data['dBR']].copy()
 
-completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
+        q2_filtered_data['BR_interpolated'] = compute_br_interpolated(
+            q2_filtered_data[['q2', 'k', 'l', 'p', 'c9', 'c10']], observable_dict_import)
 
-
+        completely_filtered_data = q2_filtered_data[q2_filtered_data['BR_rnd'] < q2_filtered_data['BR_interpolated']]
 
 
-date = datetime.datetime.now()
 
-completely_filtered_data.to_csv(
-    f'/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_{c9_busmsm}_c10_{c10_busmsm}_{date.year}_{date.month}_{date.day}_{date.hour}.csv', index=False)
+
+        date = datetime.datetime.now()
+
+        completely_filtered_data.to_csv(
+            f'/Users/oskar/MSci/new-physics/toy_data/data_generation/data/datasets/toy_data_c9_{c9_temp}_c10_{c10_temp}_{date.year}_{date.month}_{date.day}_{date.hour}_grid_0.1-0.98.csv', index=False)
 
 # %%
 import matplotlib.pyplot as plt
+
 dbr = np.array([flavio.np_prediction('dBR/dq2(B+->K*mumu)', wc_np, q2) for q2 in np.linspace(0.5,6,100)])
 plt.plot(np.linspace(0.5,6,100),np.array(dbr)*3.4e6)
 plt.hist(q2_filtered_data['q2'], density=True, bins=60)

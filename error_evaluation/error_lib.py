@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def compute_error_binned(model, dataset, number_samples, number_bins, error_sample_size, weights=None):
 
     bin_edges_qkl = [
-        np.linspace(0.5, 2, number_bins+1),           # q2
+        np.linspace(0.5, 6, number_bins+1),           # q2
         np.linspace(0, np.pi, number_bins+1),         # k
         np.linspace(0, np.pi, number_bins+1),         # l
     ]
