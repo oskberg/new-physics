@@ -133,7 +133,7 @@ wc_np.set_initial(
     {'C9_bsmumu': c9_busmsm, 'C10_bsmumu': c10_busmsm}, scale=100)
 
 # read in interpolation values
-observable_data_path = '/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/interpolation/interp_2022_1_27_13'
+observable_data_path = '/Users/jakubpazio/Imperial/Master Project/new-physics/new-physics/toy_data/data_generation/interpolation/interp_2022_1_31_0'
 # observable_data_path = 'data/interpolation/interp_2022_1_27_13'
 with open(observable_data_path, 'rb') as infile:
     observable_dict_import = pickle.load(infile)
